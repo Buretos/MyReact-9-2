@@ -1,17 +1,19 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { useSelector, useDispatch } from "react-redux";
 import { ControlPanel, Todo } from './components';
-import { createTodo, readTodos, updateTodo, deleteTodo } from './api';
+import { setTodosAction, createTodo, readTodos, updateTodo, deleteTodo } from './actions';
 import { addTodoInTodos, findTodo, removeTodoInTodos, setTodoInTodos } from './utils';
 import { NEW_TODO_ID } from './constants';
 import styles from './app.module.css';
 
 export const App = () => {
-	const [todos, setTodos] = useState([]);
-	const [searchPhrase, setSearchPhrase] = useState('');
-	const [isAlphabetSorting, setIsAlphabetSorting] = useState(false);
+	const dispatch = useDispatch();
+    const todos = useSelector(state => state.todos.todos);
+	const searchPhrase = useSelector(state => state.controlPanel.searchPhrase);
+    const isAlphabetSorting = useSelector(state => state.controlPanel.isAlphabetSorting);
 
 	const onTodoAdd = () => {
-		setTodos(addTodoInTodos(todos));
+		dispatch(setTodosAction(addTodoInTodos(todos)));
 	};
 
 	const onTodoSave = (todoId) => {
@@ -25,45 +27,43 @@ export const App = () => {
 				});
 				updatedTodos = removeTodoInTodos(updatedTodos, NEW_TODO_ID);
 				updatedTodos = addTodoInTodos(updatedTodos, todo);
-				setTodos(updatedTodos);
+				dispatch(setTodosAction(updatedTodos));
 			});
 		} else {
 			updateTodo({ id: todoId, title }).then(() => {
-				setTodos(setTodoInTodos(todos, { id: todoId, isEditing: false }));
+				dispatch(setTodosAction(setTodoInTodos(todos, { id: todoId, isEditing: false })));
 			});
 		}
 	};
 
 	const onTodoEdit = (id) => {
-		setTodos(setTodoInTodos(todos, { id, isEditing: true }));
+		dispatch(setTodosAction(setTodoInTodos(todos, { id, isEditing: true })));
 	};
 
 	const onTodoTitleChange = (id, newTitle) => {
-		setTodos(setTodoInTodos(todos, { id, title: newTitle }));
+		dispatch(setTodosAction(setTodoInTodos(todos, { id, title: newTitle })));
 	};
 
 	const onTodoCompletedChange = (id, newCompleted) => {
 		updateTodo({ id, completed: newCompleted }).then(() => {
-			setTodos(setTodoInTodos(todos, { id, completed: newCompleted }));
+			dispatch(setTodosAction(setTodoInTodos(todos, { id, completed: newCompleted })));
 		});
 	};
 
 	const onTodoRemove = (id) => {
-		deleteTodo(id).then(() => setTodos(removeTodoInTodos(todos, id)));
+		deleteTodo(id).then(() => dispatch(setTodosAction(removeTodoInTodos(todos, id))));
 	};
 
 	useEffect(() => {
 		readTodos(searchPhrase, isAlphabetSorting).then((loadedTodos) =>
-			setTodos(loadedTodos),
+			dispatch(setTodosAction(loadedTodos)),
 		);
-	}, [searchPhrase, isAlphabetSorting]);
+	}, [dispatch, searchPhrase, isAlphabetSorting]);
 
 	return (
 		<div className={styles.app}>
 			<ControlPanel
 				onTodoAdd={onTodoAdd}
-				onSearch={setSearchPhrase}
-				onSorting={setIsAlphabetSorting}
 			/>
 			<div>
 				{todos.map(({ id, title, completed, isEditing = false }) => (

@@ -1,4 +1,21 @@
 import { HTTP_METHOD } from '../constants';
+// import { debounce } from '../components/control-panel/components/search/utils';
+
+export const setTodosAction = (todos) => ({
+    type: "SET_TODOS",
+    payload: todos
+});
+
+export const setSearchPhraseAction = (searchPhrase) => ({
+    type: "SET_SEARCH",
+    payload: searchPhrase
+});
+
+export const setIsAlphabetSortingAction = (isAlphabetSorting) => ({
+    type: "SET_SORTING",
+    payload: isAlphabetSorting
+});
+
 
 const fetchServer = (method, { id, ...payload } = {}) => {
 	let url = `http://localhost:3003/todos`;

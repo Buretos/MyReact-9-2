@@ -1,20 +1,20 @@
-import { useRef, useState } from 'react';
-import { debounce } from './utils';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { setSearchPhraseAction } from '../../../../actions/actions';
 import styles from './search.module.css';
 
-export const Search = ({ onSearch }) => {
-	const [value, setValue] = useState('');
+export const Search = () => {
 
-	const debouncedOnSearch = useRef(debounce(onSearch, 1500)).current;
+	const dispatch = useDispatch();
+	const [value, setValue] = useState('');
 
 	const onChange = ({ target }) => {
 		setValue(target.value);
-		debouncedOnSearch(target.value);
 	};
 
 	const onSubmit = (event) => {
 		event.preventDefault();
-		onSearch(value);
+		dispatch(setSearchPhraseAction(value));
 	};
 
 	return (

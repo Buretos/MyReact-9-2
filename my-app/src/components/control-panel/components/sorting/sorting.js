@@ -1,13 +1,16 @@
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { setIsAlphabetSortingAction } from '../../../../actions/actions';
 import { Button } from '../../../button/button';
 import styles from './sorting.module.css';
 
-export const Sorting = ({ onSorting }) => {
+export const Sorting = () => {
 	const [isEnabled, setIsEnabled] = useState(false);
+	const dispatch = useDispatch();
 
 	const onChange = ({ target }) => {
 		setIsEnabled(target.checked);
-		onSorting(target.checked);
+		dispatch(setIsAlphabetSortingAction(target.checked));
 	};
 
 	return (
